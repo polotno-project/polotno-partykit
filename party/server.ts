@@ -1,7 +1,8 @@
-import type * as Party from "partykit/server";
+import type * as Party from 'partykit/server';
 
 export default class Server implements Party.Server {
   count = 0;
+  // users = new Set<Party.Connection>();
 
   constructor(readonly room: Party.Room) {}
 
@@ -19,12 +20,19 @@ export default class Server implements Party.Server {
   }
 
   onMessage(message: string, sender: Party.Connection) {
-    // let's log the message
-    console.log(`connection ${sender.id} sent message: ${message}`);
-    // we could use a more sophisticated protocol here, such as JSON
-    // in the message data, but for simplicity we just use a string
-    if (message === "increment") {
-      this.increment();
+    const event = JSON.parse(message);
+    if (event.type === 'patch') {
+      this.room.broadcast(message, [sender.id]);
+    }
+    if (event.type === 'request-state') {
+      [...this.room.getConnections()][0].send(
+        JSON.stringify({ type: 'request-state' })
+      );
+    }
+    if (event.type === 'reset-state') {
+      this.room.broadcast(
+        JSON.stringify({ type: 'reset-state', state: event.state })
+      );
     }
   }
 
@@ -33,7 +41,7 @@ export default class Server implements Party.Server {
     // count. This allows us to use SSR to give components an initial value
 
     // if the request is a POST, increment the count
-    if (req.method === "POST") {
+    if (req.method === 'POST') {
       this.increment();
     }
 

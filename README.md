@@ -1,5 +1,7 @@
 # 🎈 polotno-partykit
 
+Playground for enabling real-time collaboration in Polotno using PartyKit.
+
 Welcome to the party, pal!
 
 This is a [Partykit](https://partykit.io) project, which lets you create real-time collaborative applications with minimal coding effort.
